@@ -1,0 +1,32 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  background: rgb(8, 8, 25);
+}
+
+canvas {
+  display: block;
+}
+
+#homeBtn {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 10;
+
+  padding: 8px 16px;
+  border: 1px solid white;
+  border-radius: 20px;
+
+  background: rgba(20, 20, 40, 0.85);
+  color: white;
+  text-decoration: none;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+
+}
+
+#homeBtn:hover {
+  background: white;
+  color: black;
+}

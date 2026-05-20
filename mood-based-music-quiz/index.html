@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Moodwave</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <main class="app">
+
+    <section class="page active" id="startPage">
+
+      <h1>Moodwave</h1>
+      <p class="subtitle">Find random music previews based on how you feel.</p>
+      <button id="startBtn">Start Quiz</button>
+    </section>
+
+    <section class="page" id="questionOne">
+      <p class="step">Question 1 of 2</p>
+      <h2>How do you feel today?</h2>
+
+      <div class="options">
+        <button class="feeling-btn" data-feeling="happy">Happy</button>
+        <button class="feeling-btn" data-feeling="sad">Sad</button>
+        <button class="feeling-btn" data-feeling="neutral">Neutral</button>
+      </div>
+    </section>
+
+    <section class="page" id="questionTwo">
+      <p class="step">Question 2 of 2</p>
+      <h2>What kind of mood do you want?</h2>
+
+      <div class="options">
+        <button class="mood-btn" data-mood="meditation">Meditation</button>
+        <button class="mood-btn" data-mood="strong">Something Strong</button>
+        <button class="mood-btn" data-mood="calm">Something Calm</button>
+        <button class="mood-btn" data-mood="melancholic">Melancholic</button>
+      </div>
+
+      <button class="backBtn" id="backToQ1">Back</button>
+    </section>
+
+    <section class="page" id="loadingPage">
+      <h2>Finding your sound...</h2>
+      <div class="loader"></div>
+      <p id="loadingText">Searching for songs that match your mood.</p>
+    </section>
+
+    <section class="page" id="resultsPage">
+      <p class="tag">YOUR MOOD RESULTS</p>
+      <h2 id="resultTitle"></h2>
+
+      <div class="actions">
+        <button id="againBtn">Give Me Different Songs</button>
+        <button id="restartBtn">Restart Quiz</button>
+      </div>
+
+      <div id="results"></div>
+    </section>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
