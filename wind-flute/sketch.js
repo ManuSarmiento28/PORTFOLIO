@@ -1,6 +1,5 @@
 let osc, fft, reverb;
 let particles = [];
-let started = false;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -23,8 +22,6 @@ function draw() {
   amp = constrain(amp, 0, 0.45);
 
   if (mouseIsPressed) {
-    userStartAudio();
-    started = true;
     osc.freq(freq);
     osc.amp(amp, 0.08);
 
@@ -58,6 +55,10 @@ function draw() {
 
   textSize(14);
   text("hold mouse and move", width / 2, 68);
+}
+
+function mousePressed() {
+  userStartAudio();
 }
 
 function windowResized() {
