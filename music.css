@@ -97,6 +97,33 @@ nav a:hover {
   transition: transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
 }
 
+.featured-project {
+  grid-column: 1 / -1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(260px, 0.6fr);
+  align-items: center;
+  gap: 40px;
+}
+
+.featured-project .project-info {
+  margin-bottom: 0;
+}
+
+.featured-project audio,
+.featured-project video {
+  width: 100%;
+  position: relative;
+  z-index: 2;
+}
+
+.featured-project video {
+  height: auto;
+  aspect-ratio: 16 / 9;
+  border-radius: 12px;
+  background: #111;
+}
+
 .project-card:hover {
   transform: translateY(-8px);
   border-color: rgba(106,168,255,0.55);
@@ -176,6 +203,11 @@ iframe {
 
   .project-card {
     min-height: auto;
+  }
+
+  .featured-project {
+    grid-template-columns: 1fr;
+    gap: 28px;
   }
 
   iframe {
