@@ -1,331 +1,215 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UX / Prototyping | Handshake Profile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0b0c;--fg:#f1efe9;--dim:#8a8a86;--line:#26262a;--acc:#d6ff4a}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--fg);font-family:'Inter Tight',Arial,sans-serif;overflow-x:hidden;cursor:none}
+a{color:inherit;text-decoration:none;cursor:none}
+.mono{font-family:'JetBrains Mono',monospace;font-size:.78rem;letter-spacing:.04em;text-transform:uppercase}
+canvas#wave{position:fixed;inset:0;z-index:0;opacity:.4;pointer-events:none}
+main,footer{position:relative;z-index:1}
+.cur{position:fixed;left:0;top:0;width:12px;height:12px;border-radius:50%;background:#fff;mix-blend-mode:difference;pointer-events:none;z-index:100;transform:translate(-50%,-50%);transition:width .25s,height .25s,opacity .2s}
+.cur.big{width:70px;height:70px}
+.cur.hide{opacity:0}
+nav.top{position:fixed;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:22px 4%;z-index:20;mix-blend-mode:difference;color:#fff}
+nav.top .mid{display:flex;gap:28px}
+nav.top a{position:relative}
+nav.top a::after{content:"";position:absolute;left:0;bottom:-3px;height:1px;width:0;background:currentColor;transition:width .3s}
+nav.top a:hover::after,nav.top a.on::after{width:100%}
+.intro{min-height:62vh;display:flex;flex-direction:column;justify-content:flex-end;padding:150px 4% 5vh}
+.intro .mono{color:var(--acc);margin-bottom:22px}
+.intro h1{font-weight:700;font-size:clamp(3rem,10vw,9rem);line-height:.88;letter-spacing:-.05em}
+.intro h1 .ln{display:block;overflow:hidden}
+.intro h1 .ln span{display:inline-block;transform:translateY(105%);animation:up 1.1s cubic-bezier(.2,.8,.2,1) forwards}
+.intro h1 .ln:nth-child(2) span{animation-delay:.12s;color:transparent;-webkit-text-stroke:2px var(--fg)}
+.intro p.d{margin-top:26px;color:#cfcdc6;font-weight:300;font-size:1.2rem;max-width:520px}
+@keyframes up{to{transform:none}}
+.grid{padding:4vh 4% 12vh;display:grid;grid-template-columns:repeat(2,1fr);gap:22px}
+.card{position:relative;padding:22px;border:1px solid var(--line);border-radius:26px;background:rgba(14,14,16,.82);backdrop-filter:blur(10px);overflow:hidden;transition:border-color .4s,transform .5s cubic-bezier(.2,.8,.2,1)}
+.card::before{content:"";position:absolute;inset:0;background:radial-gradient(500px circle at var(--x,50%) var(--y,0%),rgba(214,255,74,.12),transparent 45%);opacity:0;transition:opacity .4s;pointer-events:none}
+.card:hover{border-color:rgba(214,255,74,.55);transform:translateY(-6px)}
+.card:hover::before{opacity:1}
+.card.wide{grid-column:span 2}
+.ch{display:flex;justify-content:space-between;align-items:baseline;gap:16px;margin-bottom:18px;position:relative;z-index:2}
+.ch .n{color:var(--acc)}
+.ch h2{font-size:clamp(1.6rem,3vw,2.4rem);font-weight:500;letter-spacing:-.03em;flex:1;margin-left:16px}
+.ch a.open{border:1px solid var(--line);padding:8px 14px;border-radius:999px;color:var(--dim);transition:.3s;white-space:nowrap}
+.ch a.open:hover{background:var(--fg);color:#0b0b0c;border-color:var(--fg)}
+.card iframe,.card video{display:block;width:100%;height:520px;border:0;border-radius:16px;background:#111;position:relative;z-index:2}
+.card.wide iframe{height:620px}
+.card video{object-fit:cover}
+.pn{display:flex;justify-content:space-between;gap:20px;padding:5vh 4%;border-top:1px solid var(--line);flex-wrap:wrap;background:rgba(11,11,12,.85)}
+.pn a{font-size:clamp(1.6rem,4vw,3.2rem);font-weight:500;letter-spacing:-.04em;transition:color .3s}
+.pn a:hover{color:var(--acc)}
+.pn small{display:block;color:var(--dim);margin-bottom:6px}
+footer{display:flex;justify-content:space-between;padding:22px 4%;border-top:1px solid var(--line);color:var(--dim);flex-wrap:wrap;gap:10px;background:rgba(11,11,12,.9)}
+.rv{opacity:0;transform:translateY(40px);transition:opacity 1s,transform 1s cubic-bezier(.2,.8,.2,1)}
+.rv.in{opacity:1;transform:none}
+@media(max-width:1000px){.grid{grid-template-columns:1fr}.card.wide{grid-column:span 1}.card.wide iframe{height:500px}}
+@media(max-width:700px){nav.top .mid{display:none}body,a{cursor:auto}.cur{display:none}.card iframe,.card video{height:380px}.ch h2{margin-left:0}.ch{flex-wrap:wrap}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}.intro h1 .ln span{transform:none}}
 
-  <title>UX / Prototyping | Handshake Profile</title>
-
-  <link rel="stylesheet" href="ux-prototyping.css" />
+.hero-t{min-height:78vh;display:flex;flex-direction:column;justify-content:flex-end;padding:150px 4% 5vh}
+.hero-t .mono{color:var(--acc);margin-bottom:22px}
+.hero-t h1{font-weight:700;font-size:clamp(3.2rem,12vw,11rem);line-height:.86;letter-spacing:-.05em}
+.hero-t h1 .ln{display:block;overflow:hidden}
+.hero-t h1 .ln span{display:inline-block;transform:translateY(105%);animation:up 1.1s cubic-bezier(.2,.8,.2,1) forwards}
+.hero-t h1 .ln:nth-child(2) span{animation-delay:.12s;color:transparent;-webkit-text-stroke:2px var(--fg)}
+.hero-t p.d{margin-top:28px;color:#cfcdc6;font-weight:300;font-size:1.25rem;max-width:660px;line-height:1.5}
+.sec{position:relative;padding:8vh 4%}
+.sh{display:flex;gap:18px;align-items:baseline;margin-bottom:30px;border-top:1px solid var(--line);padding-top:18px}
+.sh .n{color:var(--acc)}
+.sh h2{font-size:clamp(1.8rem,4.2vw,3.4rem);font-weight:500;letter-spacing:-.04em}
+.big-p{font-size:clamp(1.25rem,2.4vw,2rem);font-weight:300;line-height:1.45;color:#d8d6cf;max-width:980px}
+.card h3{font-size:1.45rem;font-weight:500;letter-spacing:-.02em;margin-bottom:12px;position:relative;z-index:2}
+.card p.t{color:#b9b7b0;line-height:1.6;font-weight:300;position:relative;z-index:2}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.g2{display:grid;grid-template-columns:repeat(2,1fr);gap:22px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:22px}
+.card .st{display:block;font-size:3rem;font-weight:700;letter-spacing:-.05em;color:var(--acc);line-height:1;margin-bottom:16px;position:relative;z-index:2}
+.fig iframe{height:80vh;min-height:560px}
+@media(max-width:1100px){.g4{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:900px){.g3,.g2,.g4{grid-template-columns:1fr}}
+</style>
 </head>
+<body>
+<canvas id="wave"></canvas>
+<div class="cur" id="cur"></div>
 
-<body class="handshake-page">
+<nav class="top mono">
+  <a href="index.html">MS©</a>
+  <div class="mid"><a href="index.html">Home</a><a href="index.html#work">Work</a><a href="index.html#contact">Contact</a></div>
+  <span id="clock">NYC</span>
+</nav>
 
-  <header>
-
-    <a href="index.html" class="logo">
-      MS
-    </a>
-
-    <nav>
-      <a href="index.html">Home</a>
-    </nav>
-
+<main>
+  <header class="hero-t">
+    <p class="mono">( UX / Prototyping )</p>
+    <h1><span class="ln"><span>Handshake</span></span><span class="ln"><span>Profile</span></span></h1>
+    <p class="d">Redesigning the student profile experience to better showcase real skills, projects, coursework, and credibility for early-career hiring.</p>
   </header>
 
-  <main>
-
-    <!-- HERO -->
-
-    <section class="intro">
-
-      <p>
-        UX / Prototyping
-      </p>
-
-      <h1>
-        Handshake Profile
-      </h1>
-
-      <h2>
-        Redesigning the student profile experience to better showcase real skills,
-        projects, coursework, and credibility for early-career hiring.
-      </h2>
-
-    </section>
-
-    <!-- OVERVIEW -->
-
-    <section class="overview single-column">
-
-      <div class="overview-text">
-
-        <span>01</span>
-
-        <h2>
-          What is Handshake?
-        </h2>
-
-        <p>
-          Handshake is a career platform that connects students with employers.
-          Profiles act as the main evaluation tool for recruiters,
-          especially for internships and entry-level opportunities.
-        </p>
-
-      </div>
-
-    </section>
-
-    <!-- PROBLEM -->
-
-    <section class="problem-section">
-
-      <div class="section-title">
-
-        <span>02</span>
-
-        <h2>
-          Problem Statement
-        </h2>
-
-      </div>
-
-      <p>
-        Students are more than a list of courses, but Handshake doesn’t reflect that.
-        Skills appear without proof, course titles lack meaning, and recruiters struggle
-        to understand what students can actually do. This especially affects early-career
-        students who have the most to prove but the least built-in way to show it.
-      </p>
-
-    </section>
-
-    <!-- USER DISCOVERY -->
-
-    <section class="cards-section">
-
-      <div class="section-title">
-
-        <span>03</span>
-
-        <h2>
-          User Discovery
-        </h2>
-
-      </div>
-
-      <div class="cards">
-
-        <div class="info-card">
-
-          <h3>
-            6 User Interviews
-          </h3>
-
-          <p>
-            Students mainly used Handshake reactively only when applying for jobs,
-            not as a long-term profile they continuously build.
-          </p>
-
-        </div>
-
-        <div class="info-card">
-
-          <h3>
-            Key Insight
-          </h3>
-
-          <p>
-            Students wanted proof of their work directly inside the application flow,
-            instead of needing external portfolio links.
-          </p>
-
-        </div>
-
-        <div class="info-card">
-
-          <h3>
-            Competitive Analysis
-          </h3>
-
-          <p>
-            We analyzed LinkedIn, Portfolium, GitHub, Behance, and Handshake
-            to identify gaps between recruiter trust and visible student work.
-          </p>
-
-        </div>
-
-      </div>
-
-    </section>
-
-    <!-- SOLUTION -->
-
-    <section class="solution-section">
-
-      <div class="section-title">
-
-        <span>04</span>
-
-        <h2>
-          Our Solution
-        </h2>
-
-      </div>
-
-      <div class="solution-grid">
-
-        <div class="solution-card">
-
-          <h3>
-            Skills Learned
-          </h3>
-
-          <p>
-            Skills become connected to actual coursework and projects,
-            instead of existing as isolated tags.
-          </p>
-
-        </div>
-
-        <div class="solution-card">
-
-          <h3>
-            Tools Used
-          </h3>
-
-          <p>
-            Students can display software, tools, and platforms used
-            during coursework and projects.
-          </p>
-
-        </div>
-
-        <div class="solution-card">
-
-          <h3>
-            Built-In Projects
-          </h3>
-
-          <p>
-            The profile becomes a portfolio space where students can
-            upload and showcase real work.
-          </p>
-
-        </div>
-
-        <div class="solution-card">
-
-          <h3>
-            Endorsements
-          </h3>
-
-          <p>
-            Peer and professor validation creates stronger credibility
-            and social proof for recruiters.
-          </p>
-
-        </div>
-
-      </div>
-
-    </section>
-
-    <!-- PROCESS -->
-
-    <section class="process-section">
-
-      <div class="section-title">
-
-        <span>05</span>
-
-        <h2>
-          Design Process
-        </h2>
-
-      </div>
-
-      <div class="process-grid">
-
-        <div class="process-card">
-
-          <span>01</span>
-
-          <h3>
-            Brainstorming
-          </h3>
-
-          <p>
-            Initial brainstorming focused on coursework visibility,
-            proof of skills, project uploads, and validation systems.
-          </p>
-
-        </div>
-
-        <div class="process-card">
-
-          <span>02</span>
-
-          <h3>
-            Mind Mapping
-          </h3>
-
-          <p>
-            We explored relationships between profiles, recruiters,
-            skills, portfolios, and endorsements.
-          </p>
-
-        </div>
-
-        <div class="process-card">
-
-          <span>03</span>
-
-          <h3>
-            Iterations x3
-          </h3>
-
-          <p>
-            The project evolved through paper prototype,
-            low-fidelity prototype, and final high-fidelity prototype.
-          </p>
-
-        </div>
-
-        <div class="process-card">
-
-          <span>04</span>
-
-          <h3>
-            User Testing
-          </h3>
-
-          <p>
-            Testing revealed that validation badges and endorsements
-            increased trust and encouraged deeper exploration of profiles.
-          </p>
-
-        </div>
-
-      </div>
-
-    </section>
-
-    <!-- FIGMA PROTOTYPE -->
-
-    <section class="prototype-section">
-
-      <div class="section-title">
-
-        <span>06</span>
-
-        <h2>
-          Interactive Prototype
-        </h2>
-
-      </div>
-
-      <div class="figma-large">
-
-        <iframe
-          src="https://embed.figma.com/design/9IXKrzx2Wfud6utrXwMFHy/Lowfi-I-P-Final?node-id=0-1&embed-host=share"
-          allowfullscreen
-        ></iframe>
-
-      </div>
-
-    </section>
-
-  </main>
-
+  <section class="sec">
+    <div class="sh rv"><span class="n mono">01</span><h2>What is Handshake?</h2></div>
+    <p class="big-p rv">Handshake is a career platform that connects students with employers. Profiles act as the main evaluation tool for recruiters, especially for internships and entry-level opportunities.</p>
+  </section>
+
+  <section class="sec">
+    <div class="sh rv"><span class="n mono">02</span><h2>Problem Statement</h2></div>
+    <p class="big-p rv">Students are more than a list of courses, but Handshake doesn’t reflect that. Skills appear without proof, course titles lack meaning, and recruiters struggle to understand what students can actually do. This especially affects early-career students who have the most to prove but the least built-in way to show it.</p>
+  </section>
+
+  <section class="sec">
+    <div class="sh rv"><span class="n mono">03</span><h2>User Discovery</h2></div>
+    <div class="g3">
+      <div class="card rv"><h3>6 User Interviews</h3><p class="t">Students mainly used Handshake reactively only when applying for jobs, not as a long-term profile they continuously build.</p></div>
+      <div class="card rv"><h3>Key Insight</h3><p class="t">Students wanted proof of their work directly inside the application flow, instead of needing external portfolio links.</p></div>
+      <div class="card rv"><h3>Competitive Analysis</h3><p class="t">We analyzed LinkedIn, Portfolium, GitHub, Behance, and Handshake to identify gaps between recruiter trust and visible student work.</p></div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sh rv"><span class="n mono">04</span><h2>Our Solution</h2></div>
+    <div class="g4">
+      <div class="card rv"><h3>Skills Learned</h3><p class="t">Skills become connected to actual coursework and projects, instead of existing as isolated tags.</p></div>
+      <div class="card rv"><h3>Tools Used</h3><p class="t">Students can display software, tools, and platforms used during coursework and projects.</p></div>
+      <div class="card rv"><h3>Built-In Projects</h3><p class="t">The profile becomes a portfolio space where students can upload and showcase real work.</p></div>
+      <div class="card rv"><h3>Endorsements</h3><p class="t">Peer and professor validation creates stronger credibility and social proof for recruiters.</p></div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sh rv"><span class="n mono">05</span><h2>Design Process</h2></div>
+    <div class="g4">
+      <div class="card rv"><span class="st">01</span><h3>Brainstorming</h3><p class="t">Initial brainstorming focused on coursework visibility, proof of skills, project uploads, and validation systems.</p></div>
+      <div class="card rv"><span class="st">02</span><h3>Mind Mapping</h3><p class="t">We explored relationships between profiles, recruiters, skills, portfolios, and endorsements.</p></div>
+      <div class="card rv"><span class="st">03</span><h3>Iterations x3</h3><p class="t">The project evolved through paper prototype, low-fidelity prototype, and final high-fidelity prototype.</p></div>
+      <div class="card rv"><span class="st">04</span><h3>User Testing</h3><p class="t">Testing revealed that validation badges and endorsements increased trust and encouraged deeper exploration of profiles.</p></div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sh rv"><span class="n mono">06</span><h2>Interactive Prototype</h2></div>
+    <div class="card fig rv">
+      <div class="ch"><span class="n mono">Figma</span><h2 style="font-size:1.3rem">Try it: click through the prototype</h2><a class="open mono" href="https://www.figma.com/design/9IXKrzx2Wfud6utrXwMFHy/Lowfi-I-P-Final?node-id=0-1" target="_blank" rel="noopener">Open in Figma ↗</a></div>
+      <iframe src="https://embed.figma.com/design/9IXKrzx2Wfud6utrXwMFHy/Lowfi-I-P-Final?node-id=0-1&amp;embed-host=share" allowfullscreen loading="lazy" title="Handshake Profile Figma prototype"></iframe>
+    </div>
+  </section>
+
+  <div class="pn">
+    <a href="vr-3d.html"><small class="mono">← Previous</small>VR / 3D</a>
+    <a href="index.html"><small class="mono">Back to →</small>Home</a>
+  </div>
+</main>
+
+<footer class="mono"><span>Designed &amp; coded by Manuela Sarmiento</span><span>NYU Integrated Design &amp; Media</span></footer>
+
+<script>
+// Wave background
+const cv=document.getElementById('wave');
+if(cv){
+  const c=cv.getContext('2d');let W,H,mx=.5,my=.5,sy=0,t=0;
+  const size=()=>{W=cv.width=innerWidth;H=cv.height=innerHeight};size();
+  addEventListener('resize',size);
+  addEventListener('pointermove',e=>{mx=e.clientX/innerWidth;my=e.clientY/innerHeight});
+  addEventListener('scroll',()=>sy=scrollY);
+  (function draw(){
+    t+=.012;c.clearRect(0,0,W,H);
+    for(let l=0;l<14;l++){
+      c.beginPath();const base=H*(.15+l/14*.75);
+      for(let x=0;x<=W;x+=14){
+        const nx=x/W,amp=(18+l*2.2)*(1.8-Math.abs(nx-mx)*.6)*(1+my*.8);
+        const y=base+Math.sin(nx*6+t*2+l*.4+sy*.002)*amp*.5+Math.sin(nx*13-t*3+l)*amp*.22;
+        x?c.lineTo(x,y):c.moveTo(x,y);
+      }
+      c.strokeStyle=l%5==0?'rgba(214,255,74,.5)':'rgba(241,239,233,.16)';c.lineWidth=1.2;c.stroke();
+    }
+    requestAnimationFrame(draw);
+  })();
+}
+
+// Custom cursor (hides over iframes so you can use the projects normally)
+const cur=document.getElementById('cur');
+if(cur){
+  addEventListener('pointermove',e=>{cur.style.left=e.clientX+'px';cur.style.top=e.clientY+'px'});
+  document.querySelectorAll('a').forEach(a=>{
+    a.addEventListener('mouseenter',()=>cur.classList.add('big'));
+    a.addEventListener('mouseleave',()=>cur.classList.remove('big'));
+  });
+  document.querySelectorAll('iframe,video').forEach(f=>{
+    f.addEventListener('mouseenter',()=>cur.classList.add('hide'));
+    f.addEventListener('mouseleave',()=>cur.classList.remove('hide'));
+  });
+}
+
+// Scroll reveal
+const io=new IntersectionObserver(es=>es.forEach(e=>{
+  if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}
+}),{threshold:.1});
+document.querySelectorAll('.rv').forEach((el,i)=>{el.style.transitionDelay=(i%2)*.08+'s';io.observe(el)});
+
+// Card spotlight follows the mouse
+document.querySelectorAll('.card').forEach(card=>{
+  card.addEventListener('pointermove',e=>{
+    const r=card.getBoundingClientRect();
+    card.style.setProperty('--x',(e.clientX-r.left)+'px');
+    card.style.setProperty('--y',(e.clientY-r.top)+'px');
+  });
+});
+
+// NYC clock
+const clk=document.getElementById('clock');
+if(clk)(function tick(){
+  clk.textContent='NYC '+new Date().toLocaleTimeString('en-US',{timeZone:'America/New_York',hour:'2-digit',minute:'2-digit',hour12:false});
+  setTimeout(tick,10000);
+})();
+</script>
 </body>
 </html>

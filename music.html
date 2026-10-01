@@ -1,111 +1,232 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Music | Manuela Sarmiento</title>
-  <link rel="stylesheet" href="music.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Music | Manuela Sarmiento</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0b0c;--fg:#f1efe9;--dim:#8a8a86;--line:#26262a;--acc:#d6ff4a}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--fg);font-family:'Inter Tight',Arial,sans-serif;overflow-x:hidden;cursor:none}
+a{color:inherit;text-decoration:none;cursor:none}
+.mono{font-family:'JetBrains Mono',monospace;font-size:.78rem;letter-spacing:.04em;text-transform:uppercase}
+canvas#wave{position:fixed;inset:0;z-index:0;opacity:.4;pointer-events:none}
+main,footer{position:relative;z-index:1}
+.cur{position:fixed;left:0;top:0;width:12px;height:12px;border-radius:50%;background:#fff;mix-blend-mode:difference;pointer-events:none;z-index:100;transform:translate(-50%,-50%);transition:width .25s,height .25s,opacity .2s}
+.cur.big{width:70px;height:70px}
+.cur.hide{opacity:0}
+nav.top{position:fixed;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:22px 4%;z-index:20;mix-blend-mode:difference;color:#fff}
+nav.top .mid{display:flex;gap:28px}
+nav.top a{position:relative}
+nav.top a::after{content:"";position:absolute;left:0;bottom:-3px;height:1px;width:0;background:currentColor;transition:width .3s}
+nav.top a:hover::after,nav.top a.on::after{width:100%}
+.intro{min-height:62vh;display:flex;flex-direction:column;justify-content:flex-end;padding:150px 4% 5vh}
+.intro .mono{color:var(--acc);margin-bottom:22px}
+.intro h1{font-weight:700;font-size:clamp(3rem,10vw,9rem);line-height:.88;letter-spacing:-.05em}
+.intro h1 .ln{display:block;overflow:hidden}
+.intro h1 .ln span{display:inline-block;transform:translateY(105%);animation:up 1.1s cubic-bezier(.2,.8,.2,1) forwards}
+.intro h1 .ln:nth-child(2) span{animation-delay:.12s;color:transparent;-webkit-text-stroke:2px var(--fg)}
+.intro p.d{margin-top:26px;color:#cfcdc6;font-weight:300;font-size:1.2rem;max-width:520px}
+@keyframes up{to{transform:none}}
+.grid{padding:4vh 4% 12vh;display:grid;grid-template-columns:repeat(2,1fr);gap:22px}
+.card{position:relative;padding:22px;border:1px solid var(--line);border-radius:26px;background:rgba(14,14,16,.82);backdrop-filter:blur(10px);overflow:hidden;transition:border-color .4s,transform .5s cubic-bezier(.2,.8,.2,1)}
+.card::before{content:"";position:absolute;inset:0;background:radial-gradient(500px circle at var(--x,50%) var(--y,0%),rgba(214,255,74,.12),transparent 45%);opacity:0;transition:opacity .4s;pointer-events:none}
+.card:hover{border-color:rgba(214,255,74,.55);transform:translateY(-6px)}
+.card:hover::before{opacity:1}
+.card.wide{grid-column:span 2}
+.ch{display:flex;justify-content:space-between;align-items:baseline;gap:16px;margin-bottom:18px;position:relative;z-index:2}
+.ch .n{color:var(--acc)}
+.ch h2{font-size:clamp(1.6rem,3vw,2.4rem);font-weight:500;letter-spacing:-.03em;flex:1;margin-left:16px}
+.ch a.open{border:1px solid var(--line);padding:8px 14px;border-radius:999px;color:var(--dim);transition:.3s;white-space:nowrap}
+.ch a.open:hover{background:var(--fg);color:#0b0b0c;border-color:var(--fg)}
+.card iframe,.card video{display:block;width:100%;height:520px;border:0;border-radius:16px;background:#111;position:relative;z-index:2}
+.card.wide iframe{height:620px}
+.card video{object-fit:cover}
+.pn{display:flex;justify-content:space-between;gap:20px;padding:5vh 4%;border-top:1px solid var(--line);flex-wrap:wrap;background:rgba(11,11,12,.85)}
+.pn a{font-size:clamp(1.6rem,4vw,3.2rem);font-weight:500;letter-spacing:-.04em;transition:color .3s}
+.pn a:hover{color:var(--acc)}
+.pn small{display:block;color:var(--dim);margin-bottom:6px}
+footer{display:flex;justify-content:space-between;padding:22px 4%;border-top:1px solid var(--line);color:var(--dim);flex-wrap:wrap;gap:10px;background:rgba(11,11,12,.9)}
+.rv{opacity:0;transform:translateY(40px);transition:opacity 1s,transform 1s cubic-bezier(.2,.8,.2,1)}
+.rv.in{opacity:1;transform:none}
+@media(max-width:1000px){.grid{grid-template-columns:1fr}.card.wide{grid-column:span 1}.card.wide iframe{height:500px}}
+@media(max-width:700px){nav.top .mid{display:none}body,a{cursor:auto}.cur{display:none}.card iframe,.card video{height:380px}.ch h2{margin-left:0}.ch{flex-wrap:wrap}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}.intro h1 .ln span{transform:none}}
+
+.mp-wrap{padding:4vh 4% 10vh;display:flex;flex-direction:column;gap:26px}
+.mp{display:grid;grid-template-columns:1fr 1.1fr;gap:34px;align-items:center;padding:30px}
+.mp:nth-child(even) .mp-media{order:-1}
+.mp .num{color:var(--acc);display:block;margin-bottom:14px}
+.mp h2{font-size:clamp(1.8rem,3.6vw,3rem);font-weight:500;letter-spacing:-.04em;line-height:1;margin-bottom:18px;position:relative;z-index:2}
+.mp p{color:#b9b7b0;font-weight:300;line-height:1.65;font-size:1.05rem;position:relative;z-index:2}
+.mp-media{position:relative;z-index:2}
+.mp-media video{display:block;width:100%;height:auto;max-height:600px;background:#000;border-radius:16px;object-fit:contain}
+.mp-media audio{width:100%;position:relative;z-index:2}
+.disc{aspect-ratio:16/10;border-radius:16px;border:1px solid var(--line);background:radial-gradient(circle at 50% 50%,#1b1b1e,#0e0e10);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;margin-bottom:14px;overflow:hidden}
+.eqb{display:flex;align-items:flex-end;gap:6px;height:90px}
+.eqb i{width:10px;height:14px;border-radius:6px;background:var(--line);transition:background .3s}
+.mp.playing .eqb i{background:var(--acc);animation:bn 1s ease-in-out infinite}
+@keyframes bn{50%{height:86px}}
+.disc small{color:var(--dim)}
+@media(max-width:1000px){.mp{grid-template-columns:1fr}.mp:nth-child(even) .mp-media{order:0}}
+</style>
 </head>
 <body>
-  <header>
-    <a href="index.html" class="logo">MS</a>
-    <nav>
-      <a href="index.html">Home</a>
-    </nav>
+<canvas id="wave"></canvas>
+<div class="cur" id="cur"></div>
+
+<nav class="top mono">
+  <a href="index.html">MS©</a>
+  <div class="mid"><a href="index.html">Home</a><a href="index.html#work">Work</a><a href="index.html#contact">Contact</a></div>
+  <span id="clock">NYC</span>
+</nav>
+
+<main>
+  <header class="intro">
+    <p class="mono">( Music )</p>
+    <h1><span class="ln"><span>Arrangements</span></span><span class="ln"><span>and Covers</span></span></h1>
   </header>
 
-  <main>
-    <section class="intro">
-      <p>Music</p>
-      <h1>Arrangements and Covers</h1>
-    </section>
+  <section class="mp-wrap" aria-label="Music projects">
 
-    <section class="project-grid" aria-label="Music projects">
-      <article class="project-card featured-project">
-        <div class="project-info">
-          <span>01</span>
-          <h2>Saturn Orchestral Arrangement</h2>
-          <p>
-            I created an orchestral arrangement of “Saturn” using FL Studio as
-            the main production platform. The entire project was developed
-            through piano recording and direct composition within the software,
-            without using any pre-recorded samples. My goal was to recreate the
-            emotional and cinematic atmosphere of the original piece, exploring
-            the dynamics of strings, brass, and harmonic textures to craft a
-            unique and personal orchestral interpretation.
-          </p>
-        </div>
-
+    <article class="card mp rv">
+      <div>
+        <span class="num mono">01</span>
+        <h2>Saturn Orchestral Arrangement</h2>
+        <p>I created an orchestral arrangement of “Saturn” using FL Studio as the main production platform. The entire project was developed through piano recording and direct composition within the software, without using any pre-recorded samples. My goal was to recreate the emotional and cinematic atmosphere of the original piece, exploring the dynamics of strings, brass, and harmonic textures to craft a unique and personal orchestral interpretation.</p>
+      </div>
+      <div class="mp-media">
+        <div class="disc"><div class="eqb"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><small class="mono">Press play ↓</small></div>
         <audio controls preload="metadata" aria-label="Play Saturn orchestral arrangement">
-          <source src="Saturn%20P5.wav" type="audio/wav" />
+          <source src="Saturn%20P5.wav" type="audio/wav">
           Your browser does not support audio playback.
         </audio>
-      </article>
+      </div>
+    </article>
 
-      <article class="project-card featured-project">
-        <div class="project-info">
-          <span>02</span>
-          <h2>Solas by Jamie Duffy</h2>
-          <p>
-            “Solas” is one of my favorite pieces for its deep emotion and
-            expressive atmosphere. This song challenged me both technically
-            and emotionally, as it required precision, control, and sensitivity
-            to capture its intensity. Learning and performing it was a rewarding
-            experience that strengthened my connection to the piano.
-          </p>
-        </div>
+    <article class="card mp rv">
+      <div>
+        <span class="num mono">02</span>
+        <h2>Solas by Jamie Duffy</h2>
+        <p>“Solas” is one of my favorite pieces for its deep emotion and expressive atmosphere. This song challenged me both technically and emotionally, as it required precision, control, and sensitivity to capture its intensity. Learning and performing it was a rewarding experience that strengthened my connection to the piano.</p>
+      </div>
+      <div class="mp-media">
+        <video controls playsinline preload="auto">
+          <source src="./Solas-clean.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+      </div>
+    </article>
 
-<video controls playsinline preload="auto">
-  <source src="./Solas-clean.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
-      </article>
-
-      <article class="project-card featured-project">
-        <div class="project-info">
-          <span>03</span>
-          <h2>Comptine d'un autre été by Yann Tiersen</h2>
-          <p>
-            “Comptine d'un autre été” is a piece I enjoy for its delicate,
-            reflective, and emotional character. Its repetitive patterns create
-            a sense of calm while still requiring control, consistency, and
-            expression throughout the performance. Learning this piece helped
-            me focus on dynamics, timing, and maintaining an emotional connection
-            to the music, making it a meaningful addition to my piano repertoire.
-          </p>
-        </div>
-
+    <article class="card mp rv">
+      <div>
+        <span class="num mono">03</span>
+        <h2>Comptine d'un autre été by Yann Tiersen</h2>
+        <p>“Comptine d'un autre été” is a piece I enjoy for its delicate, reflective, and emotional character. Its repetitive patterns create a sense of calm while still requiring control, consistency, and expression throughout the performance. Learning this piece helped me focus on dynamics, timing, and maintaining an emotional connection to the music, making it a meaningful addition to my piano repertoire.</p>
+      </div>
+      <div class="mp-media">
         <video controls playsinline preload="metadata" aria-label="Comptine d'un autre été piano performance">
-          <source src="Piano.MP4" type="video/mp4" />
+          <source src="Piano.MP4" type="video/mp4">
           Your browser does not support video playback.
         </video>
-      </article>
+      </div>
+    </article>
 
-      <article class="project-card featured-project">
-        <div class="project-info">
-          <span>04</span>
-          <h2>Where's My Love</h2>
-          <p>
-            For this cover of “Where’s My Love,” I collaborated with a classmate
-            who performed the vocals while I played guitar. I really enjoy
-            interpreting songs like this because they have a soft, emotional,
-            and intimate feeling that allows me to connect more deeply with the
-            music. Playing guitar for this piece gave me the opportunity to
-            focus on supporting the vocals while still bringing out the emotion
-            of the song. I especially enjoy this type of performance because
-            it feels more personal and expressive, and I like how a simple
-            arrangement can still create a strong emotional atmosphere.
-          </p>
-        </div>
-
+    <article class="card mp rv">
+      <div>
+        <span class="num mono">04</span>
+        <h2>Where's My Love</h2>
+        <p>For this cover of “Where’s My Love,” I collaborated with a classmate who performed the vocals while I played guitar. I really enjoy interpreting songs like this because they have a soft, emotional, and intimate feeling that allows me to connect more deeply with the music. Playing guitar for this piece gave me the opportunity to focus on supporting the vocals while still bringing out the emotion of the song. I especially enjoy this type of performance because it feels more personal and expressive, and I like how a simple arrangement can still create a strong emotional atmosphere.</p>
+      </div>
+      <div class="mp-media">
         <video controls playsinline preload="metadata" aria-label="Where's My Love guitar and vocal cover">
-          <source src="Wheres%20my%20love.MP4" type="video/mp4" />
+          <source src="Wheres%20my%20love.MP4" type="video/mp4">
           Your browser does not support video playback.
         </video>
-      </article>
-    </section>
-  </main>
+      </div>
+    </article>
 
-  <script src="music.js"></script>
+  </section>
+
+  <div class="pn">
+    <a href="live-image-processing.html"><small class="mono">← Previous</small>Live Productions</a>
+    <a href="creative-coding.html"><small class="mono">Next →</small>Creative Coding</a>
+  </div>
+</main>
+
+<footer class="mono"><span>Designed &amp; coded by Manuela Sarmiento</span><span>NYU Integrated Design &amp; Media</span></footer>
+
+<script>
+// Wave background
+const cv=document.getElementById('wave');
+if(cv){
+  const c=cv.getContext('2d');let W,H,mx=.5,my=.5,sy=0,t=0;
+  const size=()=>{W=cv.width=innerWidth;H=cv.height=innerHeight};size();
+  addEventListener('resize',size);
+  addEventListener('pointermove',e=>{mx=e.clientX/innerWidth;my=e.clientY/innerHeight});
+  addEventListener('scroll',()=>sy=scrollY);
+  (function draw(){
+    t+=.012;c.clearRect(0,0,W,H);
+    for(let l=0;l<14;l++){
+      c.beginPath();const base=H*(.15+l/14*.75);
+      for(let x=0;x<=W;x+=14){
+        const nx=x/W,amp=(18+l*2.2)*(1.8-Math.abs(nx-mx)*.6)*(1+my*.8);
+        const y=base+Math.sin(nx*6+t*2+l*.4+sy*.002)*amp*.5+Math.sin(nx*13-t*3+l)*amp*.22;
+        x?c.lineTo(x,y):c.moveTo(x,y);
+      }
+      c.strokeStyle=l%5==0?'rgba(214,255,74,.5)':'rgba(241,239,233,.16)';c.lineWidth=1.2;c.stroke();
+    }
+    requestAnimationFrame(draw);
+  })();
+}
+
+// Custom cursor (hides over iframes so you can use the projects normally)
+const cur=document.getElementById('cur');
+if(cur){
+  addEventListener('pointermove',e=>{cur.style.left=e.clientX+'px';cur.style.top=e.clientY+'px'});
+  document.querySelectorAll('a').forEach(a=>{
+    a.addEventListener('mouseenter',()=>cur.classList.add('big'));
+    a.addEventListener('mouseleave',()=>cur.classList.remove('big'));
+  });
+  document.querySelectorAll('iframe,video').forEach(f=>{
+    f.addEventListener('mouseenter',()=>cur.classList.add('hide'));
+    f.addEventListener('mouseleave',()=>cur.classList.remove('hide'));
+  });
+}
+
+// Scroll reveal
+const io=new IntersectionObserver(es=>es.forEach(e=>{
+  if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}
+}),{threshold:.1});
+document.querySelectorAll('.rv').forEach((el,i)=>{el.style.transitionDelay=(i%2)*.08+'s';io.observe(el)});
+
+// Card spotlight follows the mouse
+document.querySelectorAll('.card').forEach(card=>{
+  card.addEventListener('pointermove',e=>{
+    const r=card.getBoundingClientRect();
+    card.style.setProperty('--x',(e.clientX-r.left)+'px');
+    card.style.setProperty('--y',(e.clientY-r.top)+'px');
+  });
+});
+
+// NYC clock
+const clk=document.getElementById('clock');
+if(clk)(function tick(){
+  clk.textContent='NYC '+new Date().toLocaleTimeString('en-US',{timeZone:'America/New_York',hour:'2-digit',minute:'2-digit',hour12:false});
+  setTimeout(tick,10000);
+})();
+
+// Equalizer lights up while Saturn plays; only one media plays at a time
+const medias=document.querySelectorAll('audio,video');
+medias.forEach(m=>{
+  const card=m.closest('.mp');
+  m.addEventListener('play',()=>{card.classList.add('playing');medias.forEach(o=>{if(o!==m)o.pause()})});
+  m.addEventListener('pause',()=>card.classList.remove('playing'));
+  m.addEventListener('ended',()=>card.classList.remove('playing'));
+});
+</script>
 </body>
 </html>

@@ -1,84 +1,236 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VR / 3D | Final Containment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0b0c;--fg:#f1efe9;--dim:#8a8a86;--line:#26262a;--acc:#d6ff4a}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--fg);font-family:'Inter Tight',Arial,sans-serif;overflow-x:hidden;cursor:none}
+a{color:inherit;text-decoration:none;cursor:none}
+.mono{font-family:'JetBrains Mono',monospace;font-size:.78rem;letter-spacing:.04em;text-transform:uppercase}
+canvas#wave{position:fixed;inset:0;z-index:0;opacity:.4;pointer-events:none}
+main,footer{position:relative;z-index:1}
+.cur{position:fixed;left:0;top:0;width:12px;height:12px;border-radius:50%;background:#fff;mix-blend-mode:difference;pointer-events:none;z-index:100;transform:translate(-50%,-50%);transition:width .25s,height .25s,opacity .2s}
+.cur.big{width:70px;height:70px}
+.cur.hide{opacity:0}
+nav.top{position:fixed;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:22px 4%;z-index:20;mix-blend-mode:difference;color:#fff}
+nav.top .mid{display:flex;gap:28px}
+nav.top a{position:relative}
+nav.top a::after{content:"";position:absolute;left:0;bottom:-3px;height:1px;width:0;background:currentColor;transition:width .3s}
+nav.top a:hover::after,nav.top a.on::after{width:100%}
+.intro{min-height:62vh;display:flex;flex-direction:column;justify-content:flex-end;padding:150px 4% 5vh}
+.intro .mono{color:var(--acc);margin-bottom:22px}
+.intro h1{font-weight:700;font-size:clamp(3rem,10vw,9rem);line-height:.88;letter-spacing:-.05em}
+.intro h1 .ln{display:block;overflow:hidden}
+.intro h1 .ln span{display:inline-block;transform:translateY(105%);animation:up 1.1s cubic-bezier(.2,.8,.2,1) forwards}
+.intro h1 .ln:nth-child(2) span{animation-delay:.12s;color:transparent;-webkit-text-stroke:2px var(--fg)}
+.intro p.d{margin-top:26px;color:#cfcdc6;font-weight:300;font-size:1.2rem;max-width:520px}
+@keyframes up{to{transform:none}}
+.grid{padding:4vh 4% 12vh;display:grid;grid-template-columns:repeat(2,1fr);gap:22px}
+.card{position:relative;padding:22px;border:1px solid var(--line);border-radius:26px;background:rgba(14,14,16,.82);backdrop-filter:blur(10px);overflow:hidden;transition:border-color .4s,transform .5s cubic-bezier(.2,.8,.2,1)}
+.card::before{content:"";position:absolute;inset:0;background:radial-gradient(500px circle at var(--x,50%) var(--y,0%),rgba(214,255,74,.12),transparent 45%);opacity:0;transition:opacity .4s;pointer-events:none}
+.card:hover{border-color:rgba(214,255,74,.55);transform:translateY(-6px)}
+.card:hover::before{opacity:1}
+.card.wide{grid-column:span 2}
+.ch{display:flex;justify-content:space-between;align-items:baseline;gap:16px;margin-bottom:18px;position:relative;z-index:2}
+.ch .n{color:var(--acc)}
+.ch h2{font-size:clamp(1.6rem,3vw,2.4rem);font-weight:500;letter-spacing:-.03em;flex:1;margin-left:16px}
+.ch a.open{border:1px solid var(--line);padding:8px 14px;border-radius:999px;color:var(--dim);transition:.3s;white-space:nowrap}
+.ch a.open:hover{background:var(--fg);color:#0b0b0c;border-color:var(--fg)}
+.card iframe,.card video{display:block;width:100%;height:520px;border:0;border-radius:16px;background:#111;position:relative;z-index:2}
+.card.wide iframe{height:620px}
+.card video{object-fit:cover}
+.pn{display:flex;justify-content:space-between;gap:20px;padding:5vh 4%;border-top:1px solid var(--line);flex-wrap:wrap;background:rgba(11,11,12,.85)}
+.pn a{font-size:clamp(1.6rem,4vw,3.2rem);font-weight:500;letter-spacing:-.04em;transition:color .3s}
+.pn a:hover{color:var(--acc)}
+.pn small{display:block;color:var(--dim);margin-bottom:6px}
+footer{display:flex;justify-content:space-between;padding:22px 4%;border-top:1px solid var(--line);color:var(--dim);flex-wrap:wrap;gap:10px;background:rgba(11,11,12,.9)}
+.rv{opacity:0;transform:translateY(40px);transition:opacity 1s,transform 1s cubic-bezier(.2,.8,.2,1)}
+.rv.in{opacity:1;transform:none}
+@media(max-width:1000px){.grid{grid-template-columns:1fr}.card.wide{grid-column:span 1}.card.wide iframe{height:500px}}
+@media(max-width:700px){nav.top .mid{display:none}body,a{cursor:auto}.cur{display:none}.card iframe,.card video{height:380px}.ch h2{margin-left:0}.ch{flex-wrap:wrap}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}.intro h1 .ln span{transform:none}}
 
-  <title>VR / 3D | Final Containment</title>
-
-  <link rel="stylesheet" href="vr-3d.css" />
+.hero-t{min-height:78vh;display:flex;flex-direction:column;justify-content:flex-end;padding:150px 4% 5vh}
+.hero-t .mono{color:var(--acc);margin-bottom:22px}
+.hero-t h1{font-weight:700;font-size:clamp(3.2rem,12vw,11rem);line-height:.86;letter-spacing:-.05em}
+.hero-t h1 .ln{display:block;overflow:hidden}
+.hero-t h1 .ln span{display:inline-block;transform:translateY(105%);animation:up 1.1s cubic-bezier(.2,.8,.2,1) forwards}
+.hero-t h1 .ln:nth-child(2) span{animation:up 1.1s .12s cubic-bezier(.2,.8,.2,1) forwards,flick 5s 2s infinite;color:transparent;-webkit-text-stroke:2px var(--fg)}
+@keyframes flick{0%,92%,96%,100%{opacity:1}93%{opacity:.25}94%{opacity:1}95%{opacity:.4}}
+.hero-t p.d{margin-top:28px;color:#cfcdc6;font-weight:300;font-size:1.25rem;max-width:620px;line-height:1.5}
+.sec{position:relative;padding:9vh 4%}
+.sh{display:flex;gap:18px;align-items:baseline;margin-bottom:34px;border-top:1px solid var(--line);padding-top:18px}
+.sh .n{color:var(--acc)}
+.sh h2{font-size:clamp(1.8rem,4.2vw,3.4rem);font-weight:500;letter-spacing:-.04em}
+.story{display:grid;grid-template-columns:1fr 2fr;gap:30px;border-top:1px solid var(--line);padding-top:18px}
+.story h2{font-size:clamp(1.8rem,4.2vw,3.4rem);font-weight:500;letter-spacing:-.04em}
+.story p{font-size:clamp(1.2rem,2.2vw,1.8rem);font-weight:300;line-height:1.45;color:#d8d6cf}
+.demo{padding:22px}
+.demo video{display:block;width:100%;height:auto;max-height:78vh;border-radius:16px;background:#000;object-fit:contain}
+.gal{columns:3;column-gap:16px}
+.gal figure{break-inside:avoid;margin-bottom:16px;border-radius:16px;overflow:hidden;border:1px solid var(--line);position:relative;cursor:none;background:#111}
+.gal img{display:block;width:100%;height:auto;transition:transform .6s cubic-bezier(.2,.8,.2,1),filter .4s;filter:grayscale(.5) brightness(.85)}
+.gal figure:hover img{transform:scale(1.06);filter:none}
+.gal figure::after{content:"+";position:absolute;right:12px;bottom:10px;width:34px;height:34px;border-radius:50%;background:var(--acc);color:#0b0b0c;display:grid;place-items:center;font-weight:700;opacity:0;transform:scale(.6);transition:.3s}
+.gal figure:hover::after{opacity:1;transform:none}
+#lb{position:fixed;inset:0;background:rgba(5,5,6,.94);z-index:90;display:none;align-items:center;justify-content:center;padding:4vh 6vw}
+#lb.on{display:flex}
+#lb img{max-width:100%;max-height:88vh;border-radius:10px}
+#lb button{position:absolute;background:none;border:1px solid var(--line);color:var(--fg);border-radius:999px;width:52px;height:52px;font-size:1.3rem;cursor:none;transition:.3s}
+#lb button:hover{background:var(--acc);color:#0b0b0c;border-color:var(--acc)}
+#lb .x{top:22px;right:22px}#lb .p{left:22px}#lb .nx{right:22px}
+#lb .ct{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);color:var(--dim)}
+@media(max-width:1000px){.story{grid-template-columns:1fr}.gal{columns:2}}
+@media(max-width:600px){.gal{columns:1}#lb button{cursor:auto}.gal figure{cursor:auto}}
+</style>
 </head>
-
 <body>
+<canvas id="wave"></canvas>
+<div class="cur" id="cur"></div>
 
-  <header>
-    <a href="index.html" class="logo">MS</a>
+<nav class="top mono">
+  <a href="index.html">MS©</a>
+  <div class="mid"><a href="index.html">Home</a><a href="index.html#work">Work</a><a href="index.html#contact">Contact</a></div>
+  <span id="clock">NYC</span>
+</nav>
 
-    <nav>
-      <a href="index.html">Home</a>
-    </nav>
+<main>
+  <header class="hero-t">
+    <p class="mono">( VR / 3D Project )</p>
+    <h1><span class="ln"><span>Final</span></span><span class="ln"><span>Containment</span></span></h1>
+    <p class="d">A Unity horror game set inside a top-secret laboratory after a containment breach.</p>
   </header>
 
-  <main>
-
-    <section class="hero">
-      <p>VR / 3D PROJECT</p>
-
-      <h1>
-        Final
-        <span>Containment</span>
-      </h1>
-
-      <h2>
-        A Unity horror game set inside a top-secret laboratory after a containment breach.
-      </h2>
-    </section>
-
-    <section class="story">
+  <section class="sec" style="padding-top:4vh">
+    <div class="story rv">
       <h2>Game Story</h2>
+      <p>The story takes place in a top-secret laboratory where dangerous monsters are studied. A containment breach has occurred, and a lethal creature is now loose. The facility is under lockdown, and the threat to humanity is imminent.</p>
+    </div>
+  </section>
 
-      <p>
-        The story takes place in a top-secret laboratory where dangerous
-        monsters are studied. A containment breach has occurred, and a lethal
-        creature is now loose. The facility is under lockdown, and the threat
-        to humanity is imminent.
-      </p>
-    </section>
-
-    <section class="demo">
-      <div class="section-title">
-        <span>01</span>
-        <h2>Demo Video</h2>
-      </div>
-
+  <section class="sec" style="padding-top:2vh">
+    <div class="sh rv"><span class="n mono">01</span><h2>Demo Video</h2></div>
+    <div class="card demo rv">
       <video controls poster="images/final-containment-cover.jpg">
-        <source src="UNITY GAME_compressed.mp4" type="video/mp4" />
+        <source src="UNITY%20GAME_compressed.mp4" type="video/mp4">
       </video>
-    </section>
+    </div>
+  </section>
 
-    <section class="gallery-section">
-      <div class="section-title">
-        <span>02</span>
-        <h2>Game Screenshots</h2>
-      </div>
+  <section class="sec" style="padding-top:2vh">
+    <div class="sh rv"><span class="n mono">02</span><h2>Game Screenshots</h2></div>
+    <div class="gal" id="gal">
+    <figure class="rv"><img src="images/final-containment-1.png" alt="Final Containment screenshot 1" loading="lazy"></figure>
+    <figure class="rv"><img src="images/final-containment-2.png" alt="Final Containment screenshot 2" loading="lazy"></figure>
+    <figure class="rv"><img src="images/final-containment-3.png" alt="Final Containment screenshot 3" loading="lazy"></figure>
+    <figure class="rv"><img src="images/final-containment-4.png" alt="Final Containment screenshot 4" loading="lazy"></figure>
+    <figure class="rv"><img src="images/final-containment-5.png" alt="Final Containment screenshot 5" loading="lazy"></figure>
+    <figure class="rv"><img src="images/final-containment-6.png" alt="Final Containment screenshot 6" loading="lazy"></figure>
+    <figure class="rv"><img src="images/final-containment-7.png" alt="Final Containment screenshot 7" loading="lazy"></figure>
+    <figure class="rv"><img src="images/final-containment-8.png" alt="Final Containment screenshot 8" loading="lazy"></figure>
+    <figure class="rv"><img src="images/final-containment-9.png" alt="Final Containment screenshot 9" loading="lazy"></figure>
+    <figure class="rv"><img src="images/final-containment-10.png" alt="Final Containment screenshot 10" loading="lazy"></figure>
+    <figure class="rv"><img src="images/final-containment-11.png" alt="Final Containment screenshot 11" loading="lazy"></figure>
+    </div>
+  </section>
 
-      <div class="gallery">
-        <img src="images/final-containment-1.png" alt="Final Containment screenshot 1">
-        <img src="images/final-containment-2.png" alt="Final Containment screenshot 2">
-        <img src="images/final-containment-3.png" alt="Final Containment screenshot 3">
-        <img src="images/final-containment-4.png" alt="Final Containment screenshot 4">
-        <img src="images/final-containment-5.png" alt="Final Containment screenshot 5">
-        <img src="images/final-containment-6.png" alt="Final Containment screenshot 6">
-        <img src="images/final-containment-7.png" alt="Final Containment screenshot 7">
-        <img src="images/final-containment-8.png" alt="Final Containment screenshot 8">
-        <img src="images/final-containment-9.png" alt="Final Containment screenshot 9">
-        <img src="images/final-containment-10.png" alt="Final Containment screenshot 10">
-        <img src="images/final-containment-11.png" alt="Final Containment screenshot 11">
-      </div>
-    </section>
+  <div class="pn">
+    <a href="web-development.html"><small class="mono">← Previous</small>Web Development</a>
+    <a href="ux-prototyping.html"><small class="mono">Next →</small>UX / Prototyping</a>
+  </div>
+</main>
 
-   
-  </main>
+<footer class="mono"><span>Designed &amp; coded by Manuela Sarmiento</span><span>NYU Integrated Design &amp; Media</span></footer>
 
+<div id="lb" aria-hidden="true">
+  <button class="x" aria-label="Close">✕</button>
+  <button class="p" aria-label="Previous">←</button>
+  <img alt="">
+  <button class="nx" aria-label="Next">→</button>
+  <span class="ct mono"></span>
+</div>
+
+<script>
+// Wave background
+const cv=document.getElementById('wave');
+if(cv){
+  const c=cv.getContext('2d');let W,H,mx=.5,my=.5,sy=0,t=0;
+  const size=()=>{W=cv.width=innerWidth;H=cv.height=innerHeight};size();
+  addEventListener('resize',size);
+  addEventListener('pointermove',e=>{mx=e.clientX/innerWidth;my=e.clientY/innerHeight});
+  addEventListener('scroll',()=>sy=scrollY);
+  (function draw(){
+    t+=.012;c.clearRect(0,0,W,H);
+    for(let l=0;l<14;l++){
+      c.beginPath();const base=H*(.15+l/14*.75);
+      for(let x=0;x<=W;x+=14){
+        const nx=x/W,amp=(18+l*2.2)*(1.8-Math.abs(nx-mx)*.6)*(1+my*.8);
+        const y=base+Math.sin(nx*6+t*2+l*.4+sy*.002)*amp*.5+Math.sin(nx*13-t*3+l)*amp*.22;
+        x?c.lineTo(x,y):c.moveTo(x,y);
+      }
+      c.strokeStyle=l%5==0?'rgba(214,255,74,.5)':'rgba(241,239,233,.16)';c.lineWidth=1.2;c.stroke();
+    }
+    requestAnimationFrame(draw);
+  })();
+}
+
+// Custom cursor (hides over iframes so you can use the projects normally)
+const cur=document.getElementById('cur');
+if(cur){
+  addEventListener('pointermove',e=>{cur.style.left=e.clientX+'px';cur.style.top=e.clientY+'px'});
+  document.querySelectorAll('a').forEach(a=>{
+    a.addEventListener('mouseenter',()=>cur.classList.add('big'));
+    a.addEventListener('mouseleave',()=>cur.classList.remove('big'));
+  });
+  document.querySelectorAll('iframe,video').forEach(f=>{
+    f.addEventListener('mouseenter',()=>cur.classList.add('hide'));
+    f.addEventListener('mouseleave',()=>cur.classList.remove('hide'));
+  });
+}
+
+// Scroll reveal
+const io=new IntersectionObserver(es=>es.forEach(e=>{
+  if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}
+}),{threshold:.1});
+document.querySelectorAll('.rv').forEach((el,i)=>{el.style.transitionDelay=(i%2)*.08+'s';io.observe(el)});
+
+// Card spotlight follows the mouse
+document.querySelectorAll('.card').forEach(card=>{
+  card.addEventListener('pointermove',e=>{
+    const r=card.getBoundingClientRect();
+    card.style.setProperty('--x',(e.clientX-r.left)+'px');
+    card.style.setProperty('--y',(e.clientY-r.top)+'px');
+  });
+});
+
+// NYC clock
+const clk=document.getElementById('clock');
+if(clk)(function tick(){
+  clk.textContent='NYC '+new Date().toLocaleTimeString('en-US',{timeZone:'America/New_York',hour:'2-digit',minute:'2-digit',hour12:false});
+  setTimeout(tick,10000);
+})();
+
+// Lightbox for screenshots (click, arrows, Esc)
+const figs=[...document.querySelectorAll('#gal img')],lb=document.getElementById('lb'),lbi=lb.querySelector('img'),ct=lb.querySelector('.ct');
+let cur_i=0;
+const show=i=>{cur_i=(i+figs.length)%figs.length;lbi.src=figs[cur_i].src;lbi.alt=figs[cur_i].alt;ct.textContent=(cur_i+1)+' / '+figs.length};
+const open=i=>{show(i);lb.classList.add('on');lb.setAttribute('aria-hidden','false')};
+const close=()=>{lb.classList.remove('on');lb.setAttribute('aria-hidden','true')};
+figs.forEach((f,i)=>f.parentElement.addEventListener('click',()=>open(i)));
+lb.querySelector('.x').onclick=close;
+lb.querySelector('.p').onclick=e=>{e.stopPropagation();show(cur_i-1)};
+lb.querySelector('.nx').onclick=e=>{e.stopPropagation();show(cur_i+1)};
+lb.addEventListener('click',e=>{if(e.target===lb)close()});
+addEventListener('keydown',e=>{if(!lb.classList.contains('on'))return;if(e.key==='Escape')close();if(e.key==='ArrowLeft')show(cur_i-1);if(e.key==='ArrowRight')show(cur_i+1)});
+// bigger cursor over gallery + lightbox buttons
+const cu=document.getElementById('cur');
+document.querySelectorAll('#gal figure,#lb button').forEach(el=>{el.addEventListener('mouseenter',()=>cu.classList.add('big'));el.addEventListener('mouseleave',()=>cu.classList.remove('big'))});
+</script>
 </body>
 </html>

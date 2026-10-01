@@ -1,277 +1,181 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <title>Manuela Sarmiento Portfolio</title>
-
-  <link rel="stylesheet" href="style.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manuela Sarmiento — Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0b0c;--fg:#f1efe9;--dim:#8a8a86;--line:#26262a;--acc:#d6ff4a}
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--fg);font-family:'Inter Tight',sans-serif;overflow-x:hidden;cursor:none}
+a{color:inherit;text-decoration:none;cursor:none}
+.mono{font-family:'JetBrains Mono',monospace;font-size:.78rem;letter-spacing:.04em;text-transform:uppercase}
+canvas#wave{position:fixed;inset:0;z-index:0;opacity:.55}
+main,header,footer{position:relative;z-index:1}
+.cur{position:fixed;left:0;top:0;width:12px;height:12px;border-radius:50%;background:var(--fg);mix-blend-mode:difference;pointer-events:none;z-index:100;transform:translate(-50%,-50%);transition:width .25s,height .25s}
+.cur.big{width:70px;height:70px}
+nav{position:fixed;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:22px 4%;z-index:20;mix-blend-mode:difference}
+nav .mid{display:flex;gap:28px}
+nav a{position:relative}
+nav a::after{content:"";position:absolute;left:0;bottom:-3px;height:1px;width:0;background:currentColor;transition:width .3s}
+nav a:hover::after{width:100%}
+.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:flex-end;padding:0 4% 6vh}
+.hero .top{color:var(--dim);margin-bottom:24px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.hero .dot{display:inline-block;width:8px;height:8px;background:var(--acc);border-radius:50%;margin-right:8px;animation:blink 1.4s infinite}
+@keyframes blink{50%{opacity:.2}}
+h1{font-weight:700;font-size:clamp(3.4rem,14vw,13rem);line-height:.86;letter-spacing:-.05em;overflow:hidden}
+h1 .ln{display:block;overflow:hidden}
+h1 .ln span{display:inline-block;transform:translateY(105%);animation:up 1.1s cubic-bezier(.2,.8,.2,1) forwards}
+h1 .ln:nth-child(2) span{animation-delay:.12s;color:transparent;-webkit-text-stroke:2px var(--fg)}
+@keyframes up{to{transform:none}}
+.sub{display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-top:34px;align-items:end}
+.sub p{font-size:1.25rem;font-weight:300;max-width:480px;color:#cfcdc6}
+.scr{color:var(--acc);justify-self:end;text-align:right}
+.marq{border-block:1px solid var(--line);padding:18px 0;overflow:hidden;white-space:nowrap;background:rgba(11,11,12,.7);backdrop-filter:blur(6px)}
+.marq div{display:inline-block;font-size:2.2rem;font-weight:500;animation:m 28s linear infinite}
+.marq i{color:var(--acc);font-style:normal;margin:0 24px}
+@keyframes m{to{transform:translateX(-50%)}}
+section{padding:14vh 4%}
+.rv{opacity:0;transform:translateY(40px);transition:opacity 1s,transform 1s cubic-bezier(.2,.8,.2,1)}
+.rv.in{opacity:1;transform:none}
+.about{display:grid;grid-template-columns:1fr 2fr;gap:40px}
+.about h2{font-size:clamp(1.8rem,4.2vw,3.6rem);font-weight:500;line-height:1.05;letter-spacing:-.03em;margin-bottom:34px}
+.about p{color:#b9b7b0;font-size:1.15rem;line-height:1.6;max-width:640px;margin-bottom:16px;font-weight:300}
+.work .head{display:flex;justify-content:space-between;color:var(--dim);margin-bottom:20px}
+.row{display:flex;align-items:center;justify-content:space-between;padding:34px 0;border-top:1px solid var(--line);position:relative;overflow:hidden;transition:padding .4s,color .3s}
+.row:last-child{border-bottom:1px solid var(--line)}
+.row::before{content:"";position:absolute;inset:0;background:var(--acc);transform:translateY(101%);transition:transform .45s cubic-bezier(.2,.8,.2,1);z-index:-1}
+.row:hover{color:#0b0b0c;padding-left:3%;padding-right:3%}
+.row:hover::before{transform:none}
+.row h3{font-size:clamp(1.8rem,5.5vw,4.6rem);font-weight:500;letter-spacing:-.04em}
+.row .n{width:70px;color:var(--dim)}
+.row:hover .n{color:#0b0b0c}
+.row .go{font-size:2rem;transition:transform .4s}
+.row:hover .go{transform:rotate(-45deg)}
+.row .l{display:flex;align-items:center}
+.contact{text-align:center;padding-bottom:10vh}
+.contact .big{display:inline-block;font-size:clamp(2rem,9vw,8rem);font-weight:700;letter-spacing:-.05em;line-height:1;margin:30px 0;transition:color .3s}
+.contact .big:hover{color:var(--acc)}
+.pills{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:20px}
+.pills a{border:1px solid var(--line);padding:12px 22px;border-radius:999px;transition:.3s;display:inline-block}
+.pills a:hover{background:var(--fg);color:#0b0b0c;border-color:var(--fg)}
+footer{display:flex;justify-content:space-between;padding:26px 4%;border-top:1px solid var(--line);color:var(--dim);flex-wrap:wrap;gap:10px;background:rgba(11,11,12,.8)}
+@media(max-width:760px){.about,.sub{grid-template-columns:1fr}.scr{justify-self:start;text-align:left}nav .mid{display:none}body,a{cursor:auto}.cur{display:none}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}h1 .ln span{transform:none}}
+</style>
 </head>
-
 <body>
-
-  <div class="noise"></div>
-  <div class="cursor-glow"></div>
-
-  <header>
-
-    <div class="logo">
-      MS
-    </div>
-
-    <nav>
-      <a href="#about">About</a>
-      <a href="#sections">Work</a>
-      <a href="#contact">Contact</a>
-    </nav>
-
-  </header>
-
-  <main>
-
-    <!-- HERO -->
-
-    <section class="hero">
-
-      <div class="hero-text">
-
-        <p class="tag">
-          Sound Tech • Immersive Media • Creative Systems
-        </p>
-
-        <h1>
-          Manuela Sarmiento
-          <span>Portfolio</span>
-        </h1>
-
-        <p class="intro">
-          Exploring sound, code, interaction, immersive media,
-          and digital experiences.
-        </p>
-
-        <a href="#sections" class="main-btn">
-          Explore My Work
-        </a>
-
-      </div>
-
-      <!-- SOUND ORB -->
-
-      <div class="sound-orb">
-
-        <div class="ring ring1"></div>
-        <div class="ring ring2"></div>
-        <div class="ring ring3"></div>
-
-        <div class="equalizer">
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
-
-      </div>
-
-    </section>
-
-    <!-- ABOUT -->
-
-    <section id="about" class="about">
-
-      <p class="section-label">
-        About Me
-      </p>
-
-      <h2>
-        Designing immersive experiences through technology.
-      </h2>
-
-      <p>
-        I am an Integrated Design & Media student at NYU interested in creative
-        technology, sound, interactive media, physical computing, and experimental
-        digital experiences. My work explores how technology can become more playful,
-        emotional, and immersive through sound, visuals, interaction, and user-centered
-        design.
-
-        I enjoy building projects that combine code, music, sensors, interfaces,
-        and storytelling. 
-      </p>
-
-    </section>
-
-    <!-- WORK -->
-
-    <section id="sections" class="work">
-
-      <p class="section-label">
-        Portfolio
-      </p>
-
-      <h2>
-        Selected Areas
-      </h2>
-
-      <div class="cards">
-
-        <a class="card" href="live-image-processing.html">
-
-          <div class="icon">◌</div>
-
-          <h3>
-            Live Image Processing
-          </h3>
-
-        </a>
-
-        <a class="card" href="music.html">
-
-          <div class="icon">♫</div>
-
-          <h3>
-            Music
-          </h3>
-
-        </a>
-
-        <a class="card" href="creative-coding.html">
-
-          <div class="icon">◉</div>
-
-          <h3>
-            Creative Coding
-          </h3>
-
-        </a>
-
-        <a class="card" href="web-development.html">
-
-          <div class="icon">⌨</div>
-
-          <h3>
-            Web Development
-          </h3>
-
-        </a>
-
-        <a class="card" href="vr-3d.html">
-
-          <div class="icon">◎</div>
-
-          <h3>
-            VR / 3D
-          </h3>
-
-        </a>
-
-        <a class="card" href="ux-prototyping.html">
-
-          <div class="icon">⌘</div>
-
-          <h3>
-            UX / Prototyping
-          </h3>
-
-        </a>
-
-      </div>
-
-    </section>
-
-    <!-- CONTACT -->
-
-    <section id="contact" class="contact">
-
-      <p class="section-label">
-        Contact
-      </p>
-
-      <h2>
-        Let’s connect.
-      </h2>
-
-      <div class="contact-list">
-
-        <div class="contact-row">
-
-          <span>Email</span>
-
-          <a href="mailto:ms17201@nyu.edu">
-            ms17201@nyu.edu
-          </a>
-
-        </div>
-
-        <div class="contact-row">
-
-          <span>LinkedIn</span>
-
-          <a
-            href="https://www.linkedin.com/in/manuela-sarmiento"
-            target="_blank"
-          >
-            View Profile
-          </a>
-
-        </div>
-
-        <div class="contact-row">
-
-          <span>Handshake</span>
-
-          <a
-            href="https://app.joinhandshake.com/profiles/hmy2k2"
-            target="_blank"
-          >
-            View Profile
-          </a>
-
-        </div>
-
-        <div class="contact-row">
-
-          <span>Phone</span>
-
-          <a href="tel:+13105976875">
-            +1 310 597 6875
-          </a>
-
-        </div>
-
-        <div class="contact-row">
-
-          <span>Location</span>
-
-          <p>
-            New York City
-          </p>
-
-        </div>
-
-      </div>
-
-    </section>
-
-  </main>
-
-  <!-- FOOTER -->
-
-  <footer>
-
-    <p>
-      Designed and coded by Manuela Sarmiento
-    </p>
-
-    <p>
-      NYU Integrated Design & Media
-    </p>
-
-  </footer>
-
-  <script src="script.js"></script>
-
+<canvas id="wave"></canvas>
+<div class="cur" id="cur"></div>
+
+<nav class="mono">
+  <a href="#top">MS©</a>
+  <div class="mid"><a href="#about">About</a><a href="#work">Work</a><a href="#contact">Contact</a></div>
+  <span id="clock">NYC</span>
+</nav>
+
+<header class="hero" id="top">
+  <div class="top mono"><span><i class="dot"></i>Sound Tech / Immersive Media / Creative Systems</span><span>NYU — Integrated Design &amp; Media</span></div>
+  <h1><span class="ln"><span>Manuela</span></span><span class="ln"><span>Sarmiento</span></span></h1>
+  <div class="sub">
+    <p>Exploring sound, code, interaction, immersive media, and digital experiences.</p>
+    <a class="mono scr" href="#work" id="mag">Explore my work ↓</a>
+  </div>
+</header>
+
+<div class="marq"><div id="marq"></div></div>
+
+<main>
+<section id="about" class="about">
+  <span class="mono rv" style="color:var(--dim)">( About )</span>
+  <div class="rv">
+    <h2 id="scramble">Designing immersive experiences through technology.</h2>
+    <p>I'm an Integrated Design &amp; Media student at NYU interested in creative technology, sound, interactive media, physical computing, and experimental digital experiences.</p>
+    <p>My work explores how technology can become more playful, emotional, and immersive, through code, music, sensors, interfaces, and storytelling.</p>
+  </div>
+</section>
+
+<section id="work" class="work">
+  <div class="head mono rv"><span>( Selected Areas )</span><span>06</span></div>
+  <a class="row rv" href="live-image-processing.html"><div class="l"><span class="n mono">01</span><h3>Live Productions</h3></div><span class="go">→</span></a>
+  <a class="row rv" href="music.html"><div class="l"><span class="n mono">02</span><h3>Music</h3></div><span class="go">→</span></a>
+  <a class="row rv" href="creative-coding.html"><div class="l"><span class="n mono">03</span><h3>Creative Coding</h3></div><span class="go">→</span></a>
+  <a class="row rv" href="web-development.html"><div class="l"><span class="n mono">04</span><h3>Web Development</h3></div><span class="go">→</span></a>
+  <a class="row rv" href="vr-3d.html"><div class="l"><span class="n mono">05</span><h3>VR / 3D</h3></div><span class="go">→</span></a>
+  <a class="row rv" href="ux-prototyping.html"><div class="l"><span class="n mono">06</span><h3>UX / Prototyping</h3></div><span class="go">→</span></a>
+</section>
+
+<section id="contact" class="contact">
+  <span class="mono rv" style="color:var(--dim)">( Contact )</span>
+  <div class="rv"><a class="big" href="mailto:ms17201@nyu.edu">Let's connect →</a></div>
+  <div class="pills mono rv">
+    <a href="mailto:ms17201@nyu.edu">ms17201@nyu.edu</a>
+    <a href="https://www.linkedin.com/in/manuela-sarmiento">LinkedIn</a>
+    <a href="https://app.joinhandshake.com/profiles/hmy2k2">Handshake</a>
+    <a href="tel:+13105976875">+1 310 597 6875</a>
+  </div>
+</section>
+</main>
+
+<footer class="mono"><span>Designed &amp; coded by Manuela Sarmiento</span><span>New York City</span></footer>
+
+<script>
+// ---- flowing sound-wave background, reacts to mouse + scroll
+const cv=document.getElementById('wave'),c=cv.getContext('2d');
+let W,H,mx=.5,my=.5,sy=0,t=0;
+function size(){const d=devicePixelRatio||1;W=cv.width=innerWidth*d;H=cv.height=innerHeight*d;c.scale(1,1)}
+size();addEventListener('resize',size);
+addEventListener('pointermove',e=>{mx=e.clientX/innerWidth;my=e.clientY/innerHeight});
+addEventListener('scroll',()=>sy=scrollY);
+function draw(){
+  t+=.012;c.clearRect(0,0,W,H);
+  const lines=16;
+  for(let l=0;l<lines;l++){
+    c.beginPath();
+    const base=H*(.15+l/lines*.75);
+    for(let x=0;x<=W;x+=14){
+      const nx=x/W;
+      const amp=(18+l*2.2)*(1+Math.abs(nx-mx)*-.6+1.2)*(1+my*.8);
+      const y=base+Math.sin(nx*6+t*2+l*.4+sy*.002)*amp*.5+Math.sin(nx*13-t*3+l)*amp*.22;
+      x?c.lineTo(x,y):c.moveTo(x,y);
+    }
+    c.strokeStyle=l%5==0?'rgba(214,255,74,.5)':'rgba(241,239,233,.16)';
+    c.lineWidth=1.2;c.stroke();
+  }
+  requestAnimationFrame(draw);
+}
+if(!matchMedia('(prefers-reduced-motion:reduce)').matches)draw();else draw();
+
+// ---- custom cursor
+const cur=document.getElementById('cur');
+addEventListener('pointermove',e=>{cur.style.left=e.clientX+'px';cur.style.top=e.clientY+'px'});
+document.querySelectorAll('a').forEach(a=>{a.addEventListener('mouseenter',()=>cur.classList.add('big'));a.addEventListener('mouseleave',()=>cur.classList.remove('big'))});
+
+// ---- magnetic link
+const mag=document.getElementById('mag');
+mag.addEventListener('pointermove',e=>{const r=mag.getBoundingClientRect();mag.style.transform=`translate(${(e.clientX-r.left-r.width/2)*.4}px,${(e.clientY-r.top-r.height/2)*.6}px)`});
+mag.addEventListener('pointerleave',()=>mag.style.transform='');
+mag.style.transition='transform .25s';mag.style.display='inline-block';
+
+// ---- scroll reveal (staggered)
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.15});
+document.querySelectorAll('.rv').forEach((el,i)=>{el.style.transitionDelay=(i%3)*.08+'s';io.observe(el)});
+
+// ---- marquee
+const w=['SOUND','CODE','IMMERSIVE MEDIA','PHYSICAL COMPUTING','VR / 3D','UX','CREATIVE SYSTEMS'];
+document.getElementById('marq').innerHTML=(w.map(x=>x+'<i>✦</i>').join('')).repeat(4);
+
+// ---- text scramble when About scrolls in
+const sc=document.getElementById('scramble'),final=sc.textContent,ch='!<>-_\\/[]{}—=+*^?#';
+new IntersectionObserver((es,ob)=>{if(!es[0].isIntersecting)return;ob.disconnect();let f=0;
+const id=setInterval(()=>{sc.textContent=[...final].map((c,i)=>c==' '||i<f?c:ch[Math.floor(Math.random()*ch.length)]).join('');f+=1.2;if(f>final.length){sc.textContent=final;clearInterval(id)}},28)},{threshold:.6}).observe(sc);
+
+// ---- NYC clock
+const clk=document.getElementById('clock');
+(function tick(){clk.textContent='NYC '+new Date().toLocaleTimeString('en-US',{timeZone:'America/New_York',hour:'2-digit',minute:'2-digit',hour12:false});setTimeout(tick,10000)})();
+</script>
 </body>
 </html>
